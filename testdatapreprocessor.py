@@ -1,4 +1,4 @@
-
+import sys
 
 textelementdict = {}
 uniqTextId = 0
@@ -6,14 +6,19 @@ uniqId = "uniqTextIdCounter"
 
 answerList = {}
 
-with open("KDDTrain+_20Percent.txt", 'r') as source:
+datainputfile = "KDDTrain+_20Percent.txt"
+
+if len(sys.argv) >= 2:
+	datainputfile = sys.argv[1]
+
+with open(datainputfile , 'r') as source:
 	data = source.readlines()
 	for item in data:
 		splitItem = item.rstrip().split(',')
 		currentitemtype = splitItem[1]
 		if currentitemtype not in answerList:
 			answerList[currentitemtype] = []
-		with open("processedTrainSet"+ currentitemtype + ".txt", 'a') as f:
+		with open(datainputfile.split('.')[0] + "processedSet"+ currentitemtype + ".txt", 'a') as f:
 			del splitItem[1]
 			del splitItem[-1]
 #			print(splitItem[40] == "normal")
@@ -26,7 +31,8 @@ with open("KDDTrain+_20Percent.txt", 'r') as source:
 							a = float(a)
 						except ValueError:
 							print("Not a float")
-						#a = int(a*100)
+						if len(sys.argv) < 3 or sys.argv[2] != "-f":
+							a = int(a*100)
 						outdata += str(a)
 					else:
 						if str(index) not in textelementdict:
@@ -35,7 +41,8 @@ with open("KDDTrain+_20Percent.txt", 'r') as source:
 							if a not in textelementdict[str(index)]:
 								textelementdict[str(index)][a] = textelementdict[str(index)][uniqId]
 								textelementdict[str(index)][uniqId] += 1
-						outdata += str(textelementdict[str(index)][a])
+						if len(sys.argv) < 4 or sys.argv[3] != "-ns":
+							outdata += str(textelementdict[str(index)][a])
 				else:
 					outdata += a
 				outdata += " "
@@ -46,7 +53,7 @@ with open("KDDTrain+_20Percent.txt", 'r') as source:
 			f.write(outdata)
 
 
-	with open("TextElementDict.txt", 'w') as o:
+	with open(datainputfile.split('.')[0] + "TextElementDict.txt", 'w') as o:
 		output = ""
 		for key, value in textelementdict.items():
 			output += "{upperkey}:\n".format(upperkey=key)
@@ -56,7 +63,7 @@ with open("KDDTrain+_20Percent.txt", 'r') as source:
 
 
 	for itemtype, answerarray in answerList.items():
-		with open("AnswerList"+ itemtype + ".txt", 'w') as answer:
+		with open(datainputfile.split('.')[0] + "processedSet" + itemtype + ".txtAnswerList" + ".txt", 'w') as answer:
 			outtext = ""
 			for aitem in answerarray:
 				outtext += aitem + "\n"
